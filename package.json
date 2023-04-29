@@ -1,0 +1,27 @@
+{
+  "name": "server-pug-db",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+   "dz": "node --watch --watch-preserve-output dz.mjs"
+  },
+  "engines": {
+    "node": ">=18.11.0"
+},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Frontend211/server-pug-db.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Frontend211/server-pug-db/issues"
+  },
+  "homepage": "https://github.com/Frontend211/server-pug-db#readme",
+  "dependencies": {
+    "micro": "^10.0.1",
+    "mysql2": "^3.2.4",
+    "pug": "^3.0.2"
+  }
+}

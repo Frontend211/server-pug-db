@@ -1,0 +1,10 @@
+- pages ??=[];
+nav 
+  ul
+    each pg,index in pages 
+      li
+        if pg.href == page.href
+          span.active= pg.title
+        else 
+          a(href=pg.href)= pg.title 
+        

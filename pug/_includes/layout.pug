@@ -1,0 +1,18 @@
+- page ??= {href:'?',title:'?????'};
+doctype html 
+html 
+  head
+    meta(http-equiv="Content-Type", content="text/html;charset=UTF-8")
+    link(rel="stylesheet", href="https://unpkg.com/mvp.css/mvp.css")
+    link(rel="shortcut icon", type="image/png", href="https://learn.javascript.ru/img/favicon/favicon.png")
+    title= page.title
+    block head
+  body
+    header 
+      include nav.pug
+      h1= page.title
+    main
+      block content      
+    if page.aside
+      aside Дополнительный блок
+    include footer.pug

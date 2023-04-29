@@ -1,0 +1,8 @@
+extends _includes/layout.pug
+block append content
+  - posts ??=[]
+  each post in posts
+    article
+      h3= post.title
+      aside= post.body
+  
