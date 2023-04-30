@@ -4,12 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-   "dz": "node --watch --watch-preserve-output dz.mjs",
-   "serv": " node --watch --watch-path=./pug --watch-preserve-output server.mjs" 
+    "dz": "node --watch --watch-preserve-output dz.mjs",
+    "serv": " node --watch --watch-path=./pug --watch-preserve-output server.mjs"
   },
   "engines": {
     "node": ">=18.11.0"
-},
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Frontend211/server-pug-db.git"
@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/Frontend211/server-pug-db#readme",
   "dependencies": {
+    "cookie": "^0.5.0",
     "micro": "^10.0.1",
     "mysql2": "^3.2.4",
     "pug": "^3.0.2"

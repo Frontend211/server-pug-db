@@ -1,0 +1,10 @@
+form(method='post')
+  h2 Add post
+  label
+    | Title 
+    input(name='title')
+  label
+    | Message 
+    textarea(name="body")  
+  input(type='hidden' name='action' value='addpost')
+  input(type='submit' value='Add post')
