@@ -7,10 +7,11 @@ import { createConnection } from 'mysql2/promise';
 // https://nodejs.org/dist/latest-v18.x/docs/api/cli.html#--watch 
 // >=18.11.0
 
-const
+const 
   port = 3333,
   connection = await createConnection('mysql://user:111@192.168.100.4/northwind'),
   [tableList] = await connection.execute('SHOW TABLES'),
+  // eslint-disable-next-line quotes
   checkQ = await connection.prepare(`CALL sys.table_exists('northwind', ? , @exists)`),
   checkResultQ = await connection.prepare('SELECT @exists; '),
   server = createServer(async (request, response) => {

@@ -1,0 +1,9 @@
+form(method='post')
+  label
+    | Name
+    input(name='username')
+  label
+    | Password
+    input(name='psw' type='password')
+  button(type='submit') Submit
+  //- button(type='submit' value='Submit (POST)' formmethod='post' onclick="let dl=document.location;history.replaceState(null,'',(new window.URL(dl.pathname,dl.origin)))") submit with post

@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-   "dz": "node --watch --watch-preserve-output dz.mjs"
+   "dz": "node --watch --watch-preserve-output dz.mjs",
+   "serv": " node --watch --watch-path=./pug --watch-preserve-output server.mjs" 
   },
   "engines": {
     "node": ">=18.11.0"

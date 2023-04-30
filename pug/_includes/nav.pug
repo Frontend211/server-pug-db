@@ -1,4 +1,4 @@
-- pages ??=[];
+- pages ??= [];
 nav 
   ul
     each pg,index in pages 
@@ -6,5 +6,9 @@ nav
         if pg.href == page.href
           span.active= pg.title
         else 
-          a(href=pg.href)= pg.title 
+          a(href=pg.href)= pg.title
+  if user
+    include logout.pug
+  else
+    include login.pug
         
