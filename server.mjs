@@ -13,11 +13,10 @@ const
     console.log((new Date()).toLocaleTimeString(), request.method, request.url, 'HTTP/' + request.httpVersion);
     const 
       genFunction = getGenFunction(request),
-      postData = 'POST' === request.method ? await getAndParsePostBody(request) : '', // 
+      postData = 'POST' === request.method ? await getAndParsePostBody(request) : null,  
       cookies = parseCookie(request.headers.cookie || ''),
       user = await getUser(cookies,postData,response);
-    console.log('user=',user);
-    if (genFunction) return genFunction(user);
+    if (genFunction) return genFunction({user});
     send(response, 404, _404);
   }));
 server.listen(port, () => console.log('server start at http://localhost:' + port));
@@ -39,38 +38,41 @@ async function getAndParsePostBody(request) {
 }
 
 async function getUser(cookies, searchParams, response) { // получаем пользователя по cookies и данным html-формы
-  let user = null; // главное в этой функции
+  let userId = null; // главное в этой функции
   if (Object.keys(cookies).length > 0) console.log('\t cookies: ', cookies);
 
   // ✔ ЧИТАЕМ cookies
   if (cookies.uid) { // проверим не залогинен ли уже пользователь?
-    const testUser = await DB.getUserByCookie(cookies.uid);
-    if (testUser?) {
-      user = testUser;
-      console.log(`\t клиент предъявил валидный cookie uid, значит это ${user.name}`);
+    const testUserId = await DB.getUserByCookie(cookies.uid);
+    if (testUserId) {
+      userId = testUserId;
+      console.log(`\t клиент предъявил валидный cookie uid, id = ${userId}`);
     }
   }
   // ✔ ОБРАБОТЧИК ФОРМ !!! 
-  if (searchParams.toString()) { // попросту считаем что если url.search  не пустой - значит пришли данные от формы
+  if (searchParams) { 
     console.log(`\t form data: ${searchParams}`);
-    let UID,
+    const 
       username = searchParams.get('username'),
-      psw = searchParams.get('psw');
-    if (username && psw && (UID = await DB.loginUser(username, psw))) {
-      user = await DB.getUserByCookie(UID);
-      response.setHeader('Set-Cookie',`uid=${UID}`);
+      psw = searchParams.get('psw'),
+      [id, secret] = await DB.loginUser(username, psw);
+      // console.log('if',username ,psw , id , secret);
+    if (username && psw && id && secret ) {
+      userId = id ,
+      response.setHeader('Set-Cookie',`uid=${secret}`);
       // responseHeaders['Set-Cookie'] = [`uid=${UID}`];  // ✔ УСТАНАВЛИВАЕМ клиенту cookie
-      console.log(`\t login! ${username}|${psw} user=${user?.name}`);
+      console.log(`\t login! id = ${userId}`);
     }
-    if (searchParams.has('logout')) {  // если пожелаешь мы тебя разлогиним
-      console.log(`\t logout! user=${user?.name}`);
+    if ('logout' === searchParams.get('action')) {  // если пожелаешь мы тебя разлогиним
+      console.log(`\t logout! id=${userId}`);
       await DB.delOnlineUser(cookies.uid);
-      user = null;
-      response.setHeader('Set-Cookie',`uid=${UID}`);
+      userId = null;
+      response.setHeader('Set-Cookie',`uid=${cookies.uid};Max-Age=0`);
       // responseHeaders['Set-Cookie'] = ['uid=;Max-Age=0']; // ✔ УДАЛЯЕМ cookie у клиента
     }
   }
-  return user;
+  if (userId) return await DB.getUserData(userId);
+  return null;
 }
 
 
