@@ -91,7 +91,7 @@ async function getUser(cookies, postData, response) { // получаем пол
     case 'addpost':
       console.log(`\t\t\t addpost id=${userId}`);
       if (userId) // проверим что может писать посты 
-        await DB.newPost(...['title','body'].map(v=>postData.get(v),userId),userId);
+        await DB.newPost(...['title','body'].map(v=>postData.get(v)),userId);
       break;
   }
   console.log('\tgetUser=',userId);

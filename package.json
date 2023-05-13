@@ -7,7 +7,7 @@
   "scripts": {
     "dz": "node --watch --watch-preserve-output dz.mjs",
     "serv": " node --watch --watch-path=./pug --watch-preserve-output server.mjs",
-    "c" : "pnpm tsc",
+    "compile" : "pnpm tsc",
     "serv2" :"node --experimental-specifier-resolution=node server.mjs"
   },
   "engines": {
