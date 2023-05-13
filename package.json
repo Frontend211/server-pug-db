@@ -3,9 +3,12 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "dz": "node --watch --watch-preserve-output dz.mjs",
-    "serv": " node --watch --watch-path=./pug --watch-preserve-output server.mjs"
+    "serv": " node --watch --watch-path=./pug --watch-preserve-output server.mjs",
+    "c" : "pnpm tsc",
+    "serv2" :"node --experimental-specifier-resolution=node server.mjs"
   },
   "engines": {
     "node": ">=18.11.0"
@@ -21,9 +24,19 @@
   },
   "homepage": "https://github.com/Frontend211/server-pug-db#readme",
   "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "cookie": "^0.5.0",
     "micro": "^10.0.1",
     "mysql2": "^3.2.4",
-    "pug": "^3.0.2"
+    "pug": "^3.0.2",
+    "react-router5": "^8.0.1",
+    "router5": "^8.0.1",
+    "router5-plugin-browser": "^8.0.1",
+    "tslib": "^2.5.0",
+    "typescript": "^5.0.4",
+    "@types/node": "^20.1.1",
+    "@types/react": "^18.2.6",
+    "@types/react-dom": "^18.2.4"
   }
 }

@@ -6,8 +6,7 @@ import pages from './pug/pages.mjs';
 
 const
   PUGPATH = './pug/',
-  paths = new Map(pages.map(page => [page.href, compileFile(PUGPATH + page.pug)])),
-  posts = await((await fetch('https://jsonplaceholder.typicode.com/posts')).json());
+  paths = new Map(pages.map(page => [page.href, compileFile(PUGPATH + page.pug)]));
   // fetch node >= v18.0.0
   // https://nodejs.org/dist/latest-v18.x/docs/api/globals.html#fetch
 
@@ -19,6 +18,6 @@ export default function getGenFunction(request) {
     url = urlObject.pathname,
     page = pages.find(({ href }) => href === url);
 
-  if (paths.has(url)) return (obj = {}) => paths.get(url)({ pages, page, posts, ...obj });
+  if (paths.has(url)) return (obj = {}) => paths.get(url)({ pages, page,...obj });
   return null;
 }

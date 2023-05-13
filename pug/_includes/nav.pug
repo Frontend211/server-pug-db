@@ -7,6 +7,8 @@ nav
           span.active= pg.title
         else 
           a(href=pg.href)= pg.title
+    li
+      a(href='/react-home') 🚪 react-ssr
   if user
     include logout.pug
   else

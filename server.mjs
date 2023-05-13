@@ -1,22 +1,35 @@
 import { createServer } from 'node:http';
-import { serve, send } from 'micro';
-
-import getGenFunction, { _404 } from './pugrouter.mjs';
 import { URLSearchParams } from 'node:url';
+
+import { serve, send } from 'micro';
 import { parse as parseCookie } from 'cookie'; // https://www.npmjs.com/package/cookie
+
+import getPugGenFunction, { _404 } from './pugrouter.mjs';
+import getSSRGenFunction from './_dest/ssr-router.js';
+
 import DB from './mydb.mjs';
 
 
-const 
+const
   port = 3333,
   server = createServer(serve(async (request, response) => {
     console.log((new Date()).toLocaleTimeString(), request.method, request.url, 'HTTP/' + request.httpVersion);
-    const 
-      genFunction = getGenFunction(request),
-      postData = 'POST' === request.method ? await getAndParsePostBody(request) : null,  
-      cookies = parseCookie(request.headers.cookie || ''),
-      user = await getUser(cookies,postData,response);
-    if (genFunction) return genFunction({user});
+    const
+      genPugFunction = getPugGenFunction(request),
+      postData = 'POST' === request.method ? await getAndParsePostBody(request) : null,
+      cookies = request.headers.cookie ? parseCookie(request.headers.cookie) : null,
+      user = cookies?.uid || postData ? await getUser(cookies, postData, response) : null,
+      posts = /forum$/.test(request.url) ? await DB.getAllPosts(): [], // тут надо придумать что-то получше
+      data = { user, posts };
+    if (genPugFunction) return genPugFunction(data);
+    try {
+      const
+        genRSSRFunc = await getSSRGenFunction(request),
+        html = genRSSRFunc(data);
+      if (html) return html;
+    } catch (error) {
+      console.error('getSSRGenFunction error ', error);
+    }    
     send(response, 404, _404);
   }));
 server.listen(port, () => console.log('server start at http://localhost:' + port));
@@ -37,40 +50,51 @@ async function getAndParsePostBody(request) {
   return new URLSearchParams(body); //  🌟 применили интерфейс URLSearchParams() для POST form data
 }
 
-async function getUser(cookies, searchParams, response) { // получаем пользователя по cookies и данным html-формы
+async function getUser(cookies, postData, response) { // получаем пользователя по cookies и данным html-формы
+  console.log('\t🐌 getUser');
   let userId = null; // главное в этой функции
-  if (Object.keys(cookies).length > 0) console.log('\t cookies: ', cookies);
+  if (cookies && Object.keys(cookies).length > 0) console.log('\t\t cookies: ', cookies);
 
   // ✔ ЧИТАЕМ cookies
-  if (cookies.uid) { // проверим не залогинен ли уже пользователь?
+  if (cookies?.uid) { // проверим не залогинен ли уже пользователь?
     const testUserId = await DB.getUserByCookie(cookies.uid);
     if (testUserId) {
       userId = testUserId;
-      console.log(`\t клиент предъявил валидный cookie uid, id = ${userId}`);
+      console.log(`\t\t\t клиент предъявил валидный cookie uid, id = ${userId}`);
     }
   }
+
   // ✔ ОБРАБОТЧИК ФОРМ !!! 
-  if (searchParams) { 
-    console.log(`\t form data: ${searchParams}`);
-    const 
-      username = searchParams.get('username'),
-      psw = searchParams.get('psw'),
-      [id, secret] = await DB.loginUser(username, psw);
-      // console.log('if',username ,psw , id , secret);
-    if (username && psw && id && secret ) {
-      userId = id ,
-      response.setHeader('Set-Cookie',`uid=${secret}`);
-      // responseHeaders['Set-Cookie'] = [`uid=${UID}`];  // ✔ УСТАНАВЛИВАЕМ клиенту cookie
-      console.log(`\t login! id = ${userId}`);
-    }
-    if ('logout' === searchParams.get('action')) {  // если пожелаешь мы тебя разлогиним
-      console.log(`\t logout! id=${userId}`);
-      await DB.delOnlineUser(cookies.uid);
+  if (postData) console.log(`\t\t form data: ${postData}`);
+  switch (postData?.get('action')) {
+    case 'login':
+      // eslint-disable-next-line no-case-declarations
+      const
+        username = postData.get('username'),
+        psw = postData.get('psw'),
+        [id, secret] = await DB.loginUser(username, psw);
+
+      if (username && psw && id && secret) {
+        userId = id;
+        response.setHeader('Set-Cookie', `uid=${secret}`); // ✔ УСТАНАВЛИВАЕМ клиенту cookie
+        console.log(`\t\t\t login id = ${userId}`);
+      }
+      break;
+
+    case 'logout':
+      console.log(`\t\t\t logout id=${userId}`);
+      await DB.delOnlineUser(cookies?.uid);
       userId = null;
-      response.setHeader('Set-Cookie',`uid=${cookies.uid};Max-Age=0`);
-      // responseHeaders['Set-Cookie'] = ['uid=;Max-Age=0']; // ✔ УДАЛЯЕМ cookie у клиента
-    }
+      response.setHeader('Set-Cookie', `uid=${cookies?.uid};Max-Age=0`); // ✔ УДАЛЯЕМ cookie у клиента
+      break;
+
+    case 'addpost':
+      console.log(`\t\t\t addpost id=${userId}`);
+      if (userId) // проверим что может писать посты 
+        await DB.newPost(...['title','body'].map(v=>postData.get(v),userId),userId);
+      break;
   }
+  console.log('\tgetUser=',userId);
   if (userId) return await DB.getUserData(userId);
   return null;
 }
