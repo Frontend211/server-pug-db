@@ -11,4 +11,4 @@ router = createRouter(routes);
 
 
 
-export default _=> cloneRouter(router);
+export default () => cloneRouter(router);

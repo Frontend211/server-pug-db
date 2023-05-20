@@ -50,7 +50,7 @@ const
 
     async loginUser(login, pass) {
       const [users] = await testUserQ.execute([login, pass]);
-      if (login && pass & 1 === users.length) {
+      if (login && pass && 1 === users.length) {
         const
           [user] = users,
           secret = this.newUID();
