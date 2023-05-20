@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { renderToString } from 'react-dom/server';
-import cloneRouter from './router';
-import Root from './Root';
+import cloneRouter from './router.js';
+import Root from './Root.js';
 
 
 const

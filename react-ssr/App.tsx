@@ -1,8 +1,8 @@
 import { useRoute } from 'react-router5';
 
-import Nav from './components/Nav';
-import Forum from './components/Forum';
-import Login from './components/Login';
+import Nav from './components/Nav.js';
+import Forum from './components/Forum.js';
+import Login from './components/Login.js';
 
 
 

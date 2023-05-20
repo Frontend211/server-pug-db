@@ -1,5 +1,5 @@
 import { RouterProvider } from 'react-router5';
-import App from './App';
+import App from './App.js';
 import DataContext from './dataContext.js';
 
 

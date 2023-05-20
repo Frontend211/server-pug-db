@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import DataContext from "../dataContext.js";
-import Post from "./Post";
+import Post from "./Post.js";
 
 export default function Forum(){
   const {user, posts} = useContext(DataContext);
